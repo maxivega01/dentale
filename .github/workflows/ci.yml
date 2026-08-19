@@ -24,3 +24,5 @@ jobs:
         run: pnpm install
       - name: Build
         run: pnpm build
+        env:
+          DATABASE_URL_UNPOOLED: ${{ secrets.DATABASE_URL_UNPOOLED }}
