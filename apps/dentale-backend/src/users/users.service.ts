@@ -1,29 +1,49 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { CreateUserRequestDto } from './dto/create/create-user-request.dto';
+import { CreateUserResponseDto } from './dto/create/create-user-response.dto';
+import { UpdateUserRequestDto } from './dto/update/update-user-request.dto';
+import { UpdateUserResponseDto } from './dto/update/update-user-response.dto';
+import { FindAllUsersResponseDto } from './dto/find-all/find-all-users-response.dto';
+import { FindOneUserResponseDto } from './dto/find-one/find-one-user-response.dto';
+import { USER_REPOSITORY } from './repositories/users.repository';
+import type { UserRepository } from './repositories/users.repository';
+import { UsersMapper } from './users.mapper';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(USER_REPOSITORY) private readonly usersRepository: UserRepository,
+  ) {}
 
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(
+    createUserDto: CreateUserRequestDto,
+  ): Promise<CreateUserResponseDto> {
+    const createUserData = UsersMapper.toCreateData(createUserDto);
+    const user = await this.usersRepository.create(createUserData);
+    return UsersMapper.toCreateResponse(user);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(): Promise<FindAllUsersResponseDto[]> {
+    const users = await this.usersRepository.findAll();
+    return users.map((user) => UsersMapper.toFindAllResponse(user));
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number): Promise<FindOneUserResponseDto> {
+    const user = await this.usersRepository.findOne(id);
+    if (!user) throw new NotFoundException(`User #${id} not found`);
+    return UsersMapper.toFindOneResponse(user);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(
+    id: number,
+    updateUserDto: UpdateUserRequestDto,
+  ): Promise<UpdateUserResponseDto> {
+    const updateUserData = UsersMapper.toUpdateData(updateUserDto);
+    const user = await this.usersRepository.update(id, updateUserData);
+    return UsersMapper.toUpdateResponse(user);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: number): Promise<void> {
+    return this.usersRepository.remove(id);
   }
 }
