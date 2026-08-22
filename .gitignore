@@ -38,4 +38,3 @@ yarn-error.log*
 
 #prisma 
 packages/database/src/generated/prisma
-packages/database/.env

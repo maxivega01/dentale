@@ -2,13 +2,18 @@
   "name": "dentale",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "check-types": "turbo run check-types",
+    "dev": "dotenv -e .env -- turbo run dev",
+    "build": "dotenv -e .env -- turbo run build",
+    "db:generate": "dotenv -e .env -- turbo run db:generate",
+    "db:migrate": "dotenv -e .env -- turbo run db:migrate",
+    "db:deploy": "dotenv -e .env -- turbo run db:deploy"
   },
+  
   "devDependencies": {
+    "dotenv-cli": "^11.0.0",
     "prettier": "^3.7.4",
     "turbo": "^2.10.10",
     "typescript": "5.9.2"
